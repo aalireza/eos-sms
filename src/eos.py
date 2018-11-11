@@ -87,7 +87,7 @@ class Admin(object):
         self.name = self._id["name"]
         self._upload_smartcontract()
         self.set_max_supply(self.total_supply)
-        self.issue_tokens(self.amount, "100000000.0000")
+        self.issue_tokens(self.name, "100000000.0000")
 
     def issue_tokens(self, for_, amount):
         a = (
