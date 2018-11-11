@@ -11,7 +11,7 @@ signature_holder = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
 def create_wallet(name):
     check_output([
         "cleos", "wallet", "create", "--name", name, "--file",
-        f"/tmp/{name}_password.txt"
+        "/tmp/{}_password.txt".format(name)
     ])
     with open("/tmp/{}_password.txt".format(name), "r") as f:
         password = f.read()
@@ -20,7 +20,7 @@ def create_wallet(name):
 
 def create_keys(name):
     def create_a_key(name):
-        filename = "/tmp/{name}_keys.txt".format(name)
+        filename = "/tmp/{}_keys.txt".format(name)
         check_output(["cleos", "create", "key", "--file", filename])
         with open(filename, "r") as f:
             keys = f.readlines()
