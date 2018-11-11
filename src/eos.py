@@ -2,6 +2,7 @@ from subprocess import check_output
 from time import time
 from random import sample
 import re
+import json
 
 
 signature_holder = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
@@ -62,6 +63,35 @@ def give_money_to(account, amount):
     pass
 
 
+class Admin(object):
+    def _upload_smartcontract(self):
+        check_output(["cleos", "set", "contract", self.name, "./src/eosio.token",
+                      "-p", self.name])
+
+    def set_max_supply(self, amount="1000000000.0000"):
+        a = (
+            "cleos push action " +
+            str(self.name) +
+            """ create '{"issuer":"eosio", "maximum_supply":" """[:-1] + str(amount) + """ TMT"}' -p """ + str(self.name) + "@active"
+        )
+        print(a)
+        check_output(a, shell=True)
+
+    def __init__(self):
+        self._id = Commands.Create("ldmin")
+        self.name = self._id["name"]
+        self._upload_smartcontract()
+        self.set_max_supply()
+
+    def issue_tokens(self, for_, amount):
+        a = (
+            f"cleos push action {self.name} issue " +
+            f"""'[ "{for_}", "{amount} TMT", "memo" ]' -p eosio"""
+        )
+        print(a)
+        check_output(a, shell=True)
+
+
 class Commands(object):
     @staticmethod
     def Create(number):
@@ -70,7 +100,9 @@ class Commands(object):
         while wallet_exists(name) or any(x in str(i) for x in "06789"):
             i += 1
             name = f"{number}{i}"
+        print(name)
         keys = create_keys(name)
+        print(keys)
         password = create_wallet(name)
         import_keys(name, keys)
         create_account(name, keys)
@@ -81,11 +113,24 @@ class Commands(object):
         }
 
     @staticmethod
-    def Send(amount, from_, to):
-        raise NotImplementedError
+    def Send(admin_name, amount, from_, to):
+        a = (
+            "cleos push action " +
+            str(admin_name) +
+            """ transfer '[ " """[:-1] +
+            str(from_) +
+            '", "' +
+            str(to) +
+            '", "' +
+            f'{amount} TMT' +
+            '", "m"]' +
+            f"' -p {from_}@active"
+        )
+        return check_output(a, shell=True)
 
-    def _GetBalance():
-        raise NotImplementedError
+    def _GetBalance(admin_name, of):
+        response = json.loads(check_output(["cleos", "get", "table", admin_name, of, "accounts"]).decode('utf-8'))
+        return response['rows']
 
     def _GetHistory(with_=None):
         if with_ is not None:
