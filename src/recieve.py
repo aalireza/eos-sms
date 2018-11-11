@@ -1,6 +1,15 @@
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
 from database import BackEnd
+from twilio.rest import Client
+'''
+# Your Account SID from twilio.com/console
+account_sid = "AC52a81e38ad7367da7a67858cb8cb0203"
+# Your Auth Token from twilio.com/console
+auth_token  = "1b171bc9dc5912e5a3407432e2c34924"
+
+client = Client(account_sid, auth_token)
+'''
 
 app = Flask(__name__)
 db = BackEnd()
@@ -9,8 +18,10 @@ db = BackEnd()
 def parse_sms(sms, From):
     sms = sms.lower().split()
     commands = {'create' : db.create, 'send' : db.send, 'get' : {'balance' : db.get_balance, 'history' : db.get_history}}
-    assert sms[0] in commands
+    #assert sms[0] in commands
     success = True
+    if sms[0] not in commands:
+        return None, None, None
     if sms[0] != 'create':
         success = db.verify(num = From, auth = sms[-1])
         if not success:
@@ -36,6 +47,9 @@ def sms_reply():
     
     cmd, params, success = parse_sms(Body, From)
     
+    if success is None:
+        msg = resp.message('Invalid Command')
+        return str(resp)
     if not success:
         msg = resp.message('verification failed')
         return str(resp)
@@ -45,10 +59,13 @@ def sms_reply():
     
     print(params)
     print(cmd)
+    
     try:
         response, misc = cmd(**params)
     except:
         response = "\ninvalid command"
+    
+    response, misc = cmd(**params)
     print(response)
     msg = resp.message(response)
     media = misc.get('totp') if misc else None
