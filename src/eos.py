@@ -62,6 +62,8 @@ def create_account(name, keys):
 def give_money_to(account, amount):
     pass
 
+def random_name():
+    return ''.join(sample("12345abcdefghijklmnopqrstuvwxyz", 11))
 
 class Admin(object):
     def _upload_smartcontract(self):
@@ -77,7 +79,7 @@ class Admin(object):
         check_output(a, shell=True)
 
     def __init__(self):
-        name = ''.join(sample("12345abcdefghijklmnopqrstuvwxyz", 11))
+        name = random_name()
         self._id = Commands.Create(name)
         self.name = self._id["name"]
         self._upload_smartcontract()
@@ -95,11 +97,7 @@ class Admin(object):
 class Commands(object):
     @staticmethod
     def Create(number):
-        i = 1
-        name = "{}{}".format(number, i)
-        while wallet_exists(name) or any(x in str(i) for x in "06789"):
-            i += 1
-            name = "{}{}".format(number, i)
+        name = random_name()
         print(name)
         keys = create_keys(name)
         print(keys)
