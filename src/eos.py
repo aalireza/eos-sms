@@ -67,7 +67,7 @@ def random_name():
 
 class Admin(object):
     def _upload_smartcontract(self):
-        check_output(["cleos", "set", "contract", self.name, "./src/eosio.token",
+        check_output(["cleos", "set", "contract", self.name, "./eosio.token",
                       "-p", self.name])
 
     def set_max_supply(self, amount="1000000000.0000"):
