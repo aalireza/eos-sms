@@ -1,23 +1,4 @@
-class Commands(object):
-    @staticmethod
-    def Create(number):
-        raise NotImplementedError
-
-    @staticmethod
-    def Send(amount, from_, to):
-        raise NotImplementedError
-
-    def _GetBalance():
-        raise NotImplementedError
-
-    def _GetHistory(with_=None):
-        if with_ is not None:
-            raise NotImplementedError
-        raise NotImplementedError
-
-    @staticmethod
-    def Get(topic, *args, **kwargs):
-        getattr(Commands, f"_Get{topic.capitalize()}")(*args, **kwargs)
+from eos import Commands
 
 
 class TextEvaluator(object):
