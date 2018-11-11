@@ -130,11 +130,8 @@ class Commands(object):
             '", "m"]' +
             "' -p {}@active".format(from_)
         )
-        try:
-            check_output(a, shell=True)
-            return True
-        except Exception():
-            return False
+        check_output(a, shell=True)
+        return True
 
     def _GetBalance(admin_name, of):
         response = json.loads(check_output(["cleos", "get", "table", admin_name, of, "accounts"]).decode('utf-8'))
@@ -148,4 +145,3 @@ class Commands(object):
     @staticmethod
     def Get(topic, *args, **kwargs):
         getattr(Commands, "_Get{}".format(topic.capitalize()))(*args, **kwargs)
-
