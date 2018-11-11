@@ -8,23 +8,24 @@ from eos import Admin, Commands
 class BackEnd:
     def __init__(self, client = None):
         self.client = MongoClient()
+        self.client.drop_database('project_sms')
         self.db = self.client.project_sms
         self.db.user_info.drop()
         self.user_info = self.db.user_info
-        self.admin = Admin()._id
+        self.admin = Admin()
         
         #create admin
         self.user_info.insert({"_id" : 0,
                                "num" : 0000000000,
                                "seed" : None,
-                               "wallet" : self.admin
+                               "wallet" : self.admin._id
                                })
                                
         
         
     def get_balance(self, **args):
         #return self.user_info.find_one({"_id" : id}).get('balance', 0.0) if id else self.user_info.find_one({"num" : num}).get('balance', 0.0)
-        return 'Balance: %f' %0.0, None
+        return 'Balance: %f.4d' %Commands.Get(topic = "balance"), None
     
     def get_history(self, **args):
         return None, None
@@ -40,7 +41,13 @@ class BackEnd:
         self.user_info.update_one(reciever, { "$set" : {"balance" : r_balance + amt}})
         return True
         '''
-        return "\nsent %s from your wallet to %s" %(args.get('amt'), args.get('To')), None
+        admin_name, amount, from_, to = self.admin.name, args.get('amt'), args.get('From'), args.get('To')
+        success = Commands.Send(admin_name, amount, from_, to)
+        
+        if success:
+            return "\nsent %s from your wallet to %s" %(args.get('amt'), args.get('To')), None
+        else:
+            return "transaction failed", None
     
     def verify(self, num, auth):
         user = self.user_info.find_one({'num' : num})
