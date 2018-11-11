@@ -125,7 +125,11 @@ class Commands(object):
             '", "m"]' +
             f"' -p {from_}@active"
         )
-        return check_output(a, shell=True)
+        try:
+            check_output(a, shell=True)
+            return True
+        except Exception():
+            return False
 
     def _GetBalance(admin_name, of):
         response = json.loads(check_output(["cleos", "get", "table", admin_name, of, "accounts"]).decode('utf-8'))
