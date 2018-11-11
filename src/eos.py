@@ -92,7 +92,7 @@ class Admin(object):
     def issue_tokens(self, for_, amount):
         a = (
             "cleos push action {} issue ".format(self.name) +
-            """'[ "{}", "{} SMS", "memo" ]' -p eosio""".format(self.for_, self.amount)
+            """'[ "{}", "{} SMS", "memo" ]' -p eosio""".format(for_, amount)
         )
         print(a)
         check_output(a, shell=True)
