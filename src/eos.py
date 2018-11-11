@@ -109,7 +109,7 @@ class Commands(object):
         import_keys(name, keys)
         create_account(name, keys)
         if admin is not None:
-            Commands.Send(admin.name, "50.0000 SMS", from_=admin.name, to=name)
+            Commands.Send(admin.name, "50.0000", from_=admin.name, to=name)
         return {
             "name": name,
             "keys": keys,
