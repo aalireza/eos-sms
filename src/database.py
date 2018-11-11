@@ -11,6 +11,7 @@ class BackEnd:
         self.client.drop_database('project_sms')
         self.db = self.client.project_sms
         self.db.user_info.drop()
+        self.db.user_info.delete_many({})
         self.user_info = self.db.user_info
         self.admin = Admin()
         
@@ -25,8 +26,8 @@ class BackEnd:
         
     def get_balance(self, **args):
         #return self.user_info.find_one({"_id" : id}).get('balance', 0.0) if id else self.user_info.find_one({"num" : num}).get('balance', 0.0)
-        return 'Balance: %f.4d' %Commands.Get(topic = "balance"), None
-    
+        #return str('Balance: %f.4d' %(Commands.Get(topic = "balance", admin_name = self.admin.name, of = args.get('From')))), None
+        return 'Balance: %s' %Commands._GetBalance(admin_name = self.admin.name, of = args.get('From')), None
     def get_history(self, **args):
         return None, None
     
@@ -64,14 +65,23 @@ class BackEnd:
         qr = pyqrcode.create(totp)
         qr_location = 'qr_codes/%s.png' %From
         qr.png(qr_location, scale=5)
-        
+        self.user_info.update_one({"num" : From}, 
+                              {"$set": {"num" : From,
+                               "seed" : seed,
+                               "qr" : qr_location,
+                               "wallet" : Commands.Create(From)
+                               }}, upsert=True)
+        '''
         self.user_info.insert({"num" : From,
                                "seed" : seed,
                                "qr" : qr_location,
                                "wallet" : Commands.Create(From)
                                })
+                               '''
         
         ret_string = "\nA new account has been created for %s.\nYour 2FA key is: %s" %(From, seed)
+        #ret_string = seed
+        print(ret_string, {'totp' : totp, 'seed' : seed, 'media' : qr_location})
         return ret_string, {'totp' : totp, 'seed' : seed, 'media' : qr_location}
     
 '''
