@@ -13,14 +13,14 @@ def create_wallet(name):
         "cleos", "wallet", "create", "--name", name, "--file",
         f"/tmp/{name}_password.txt"
     ])
-    with open(f"/tmp/{name}_password.txt", "r") as f:
+    with open("/tmp/{}_password.txt".format(name), "r") as f:
         password = f.read()
     return password.rstrip()
 
 
 def create_keys(name):
     def create_a_key(name):
-        filename = f"/tmp/{name}_keys.txt"
+        filename = "/tmp/{name}_keys.txt".format(name)
         check_output(["cleos", "create", "key", "--file", filename])
         with open(filename, "r") as f:
             keys = f.readlines()
@@ -43,7 +43,7 @@ def wallet_exists(name):
 
 
 def wallet_is_unlocked(name):
-    return f"{name} *" in extract_all_wallets()
+    return "{} *".format(name) in extract_all_wallets()
 
 
 def import_keys(name, keys):
@@ -77,15 +77,15 @@ class Admin(object):
         check_output(a, shell=True)
 
     def __init__(self):
-        self._id = Commands.Create("ldmin")
+        self._id = Commands.Create("lzzdminn")
         self.name = self._id["name"]
         self._upload_smartcontract()
         self.set_max_supply()
 
     def issue_tokens(self, for_, amount):
         a = (
-            f"cleos push action {self.name} issue " +
-            f"""'[ "{for_}", "{amount} TMT", "memo" ]' -p eosio"""
+            "cleos push action {} issue ".format(self.name) +
+            """'[ "{}", "{} TMT", "memo" ]' -p eosio""".format(self.format, self.amount)
         )
         print(a)
         check_output(a, shell=True)
@@ -95,10 +95,10 @@ class Commands(object):
     @staticmethod
     def Create(number):
         i = 1
-        name = f"{number}{i}"
+        name = "{}{}".format(number, i)
         while wallet_exists(name) or any(x in str(i) for x in "06789"):
             i += 1
-            name = f"{number}{i}"
+            name = "{}{}".format(number, i)
         print(name)
         keys = create_keys(name)
         print(keys)
@@ -121,9 +121,9 @@ class Commands(object):
             '", "' +
             str(to) +
             '", "' +
-            f'{amount} TMT' +
+            '{} TMT'.format(amount) +
             '", "m"]' +
-            f"' -p {from_}@active"
+            "' -p {}@active".format(from_)
         )
         try:
             check_output(a, shell=True)
@@ -142,5 +142,5 @@ class Commands(object):
 
     @staticmethod
     def Get(topic, *args, **kwargs):
-        getattr(Commands, f"_Get{topic.capitalize()}")(*args, **kwargs)
+        getattr(Commands, "_Get{}".format(topic.capitalize()))(*args, **kwargs)
 
