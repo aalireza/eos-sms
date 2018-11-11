@@ -20,4 +20,3 @@ dependencies:
   - xz=5.2.4=h14c3975_4
   - zlib=1.2.11=ha838bed_2
 prefix: /home/penger/.conda/envs/eos
-
