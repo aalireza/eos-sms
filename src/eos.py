@@ -77,7 +77,7 @@ class Admin(object):
         check_output(a, shell=True)
 
     def __init__(self):
-        name = sample("12345abcdefghijklmnopqrstuvwxyz", 12)
+        name = ''.join(sample("12345abcdefghijklmnopqrstuvwxyz", 11))
         self._id = Commands.Create(name)
         self.name = self._id["name"]
         self._upload_smartcontract()
