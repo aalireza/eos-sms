@@ -1,0 +1,11 @@
+pip install twilio 
+
+#ngrok setup
+wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-arm.zip
+unzip ngrok-stable-linux-arm.zip
+./ngrok authtoken 2xhH26iTMamk8xN4jZ3QY_7DoREtkPkDu823sYpFN4x
+
+pip install pymongo
+
+#https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+pip install opencv-python qrcode pyotp Pillow
