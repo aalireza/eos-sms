@@ -77,7 +77,8 @@ class Admin(object):
         check_output(a, shell=True)
 
     def __init__(self):
-        self._id = Commands.Create("lzzdminn")
+        name = sample("12345abcdefghijklmnopqrstuvwxyz", 12)
+        self._id = Commands.Create(name)
         self.name = self._id["name"]
         self._upload_smartcontract()
         self.set_max_supply()
