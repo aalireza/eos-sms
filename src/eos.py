@@ -135,7 +135,7 @@ class Commands(object):
 
     def _GetBalance(admin_name, of):
         response = json.loads(check_output(["cleos", "get", "table", admin_name, of, "accounts"]).decode('utf-8'))
-        return response['rows']
+        return response['rows'][0]['balance']
 
     def _GetHistory(with_=None):
         if with_ is not None:
