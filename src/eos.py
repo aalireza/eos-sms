@@ -62,33 +62,37 @@ def create_account(name, keys):
 def give_money_to(account, amount):
     pass
 
+
 def random_name():
     return ''.join(sample("12345abcdefghijklmnopqrstuvwxyz", 11))
+
 
 class Admin(object):
     def _upload_smartcontract(self):
         check_output(["cleos", "set", "contract", self.name, "./eosio.token",
                       "-p", self.name])
 
-    def set_max_supply(self, amount="1000000000.0000"):
+    def set_max_supply(self, amount):
         a = (
             "cleos push action " +
             str(self.name) +
-            """ create '{"issuer":"eosio", "maximum_supply":" """[:-1] + str(amount) + """ TMT"}' -p """ + str(self.name) + "@active"
+            """ create '{"issuer":"eosio", "maximum_supply":" """[:-1] + str(amount) + """ SMS"}' -p """ + str(self.name) + "@active"
         )
         check_output(a, shell=True)
 
     def __init__(self):
+        self.total_supply = "1000000000.0000"
         name = random_name()
-        self._id = Commands.Create(name)
+        self._id = Commands.Create()
         self.name = self._id["name"]
         self._upload_smartcontract()
-        self.set_max_supply()
+        self.set_max_supply(self.total_supply)
+        self.issue_tokens(self.amount, "100000000.0000")
 
     def issue_tokens(self, for_, amount):
         a = (
             "cleos push action {} issue ".format(self.name) +
-            """'[ "{}", "{} TMT", "memo" ]' -p eosio""".format(self.format, self.amount)
+            """'[ "{}", "{} SMS", "memo" ]' -p eosio""".format(self.format, self.amount)
         )
         print(a)
         check_output(a, shell=True)
@@ -96,7 +100,7 @@ class Admin(object):
 
 class Commands(object):
     @staticmethod
-    def Create(number):
+    def Create(admin=None):
         name = random_name()
         print(name)
         keys = create_keys(name)
@@ -104,6 +108,8 @@ class Commands(object):
         password = create_wallet(name)
         import_keys(name, keys)
         create_account(name, keys)
+        if admin is not None:
+            Commands.Send(admin.name, "50.0000 SMS", from_=admin.name, to=name)
         return {
             "name": name,
             "keys": keys,
@@ -120,7 +126,7 @@ class Commands(object):
             '", "' +
             str(to) +
             '", "' +
-            '{} TMT'.format(amount) +
+            '{} SMS'.format(amount) +
             '", "m"]' +
             "' -p {}@active".format(from_)
         )
@@ -132,7 +138,7 @@ class Commands(object):
 
     def _GetBalance(admin_name, of):
         response = json.loads(check_output(["cleos", "get", "table", admin_name, of, "accounts"]).decode('utf-8'))
-        return 0 if len(response['rows']) == 0 else response['rows'][0]["balance"]
+        return response['rows']
 
     def _GetHistory(with_=None):
         if with_ is not None:
