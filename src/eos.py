@@ -74,7 +74,6 @@ class Admin(object):
             str(self.name) +
             """ create '{"issuer":"eosio", "maximum_supply":" """[:-1] + str(amount) + """ TMT"}' -p """ + str(self.name) + "@active"
         )
-        print(a)
         check_output(a, shell=True)
 
     def __init__(self):
